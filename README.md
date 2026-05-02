@@ -28,6 +28,7 @@ skill-space/
     ├── .copilot/                # GitHub Copilot specific config
     ├── AGENTS.md                # base agent instructions template
     ├── CLAUDE.md                # base Claude Code instructions template
+    ├── DESIGN.md                # base design system template (Google DESIGN.md spec)
     └── onboard_to_project.sh   # interactive install / uninstall script
 ```
 
@@ -60,6 +61,7 @@ The interactive script guides you through three steps:
 | `agents/` + `skills/` | `.copilot/` | Copilot workspace config |
 | `AGENTS.md` | project root | base agent instructions |
 | `CLAUDE.md` | project root | Claude Code instructions |
+| `DESIGN.md` | project root | brand & design system (Google DESIGN.md spec) |
 
 > All installed items are automatically added to `.gitignore` — invisible to your project's git and your teammates.
 

@@ -161,7 +161,8 @@ if [ "$MODE_SEL" -eq 0 ]; then
     ".agents/skills" \
     ".copilot/agents + .copilot/skills" \
     "AGENTS.md" \
-    "CLAUDE.md"
+    "CLAUDE.md" \
+    "DESIGN.md"
 
   echo ""
   echo "Repo: $REPO_ROOT"
@@ -203,6 +204,12 @@ if [ "$MODE_SEL" -eq 0 ]; then
     gitignore_add "CLAUDE.md"
   fi
 
+  if [ "${SELECTED[5]}" -eq 1 ]; then
+    echo "DESIGN.md"
+    copy_item "$SCRIPT_DIR/DESIGN.md" "$REPO_ROOT/DESIGN.md"
+    gitignore_add "DESIGN.md"
+  fi
+
   echo ""
   printf "  Remove skill-space from this repo? [y/N] "
   IFS= read -r answer </dev/tty
@@ -226,7 +233,8 @@ else
     ".agents/skills" \
     ".copilot/agents + .copilot/skills" \
     "AGENTS.md" \
-    "CLAUDE.md"
+    "CLAUDE.md" \
+    "DESIGN.md"
 
   echo ""
   printf "  Remove selected files from $(basename "$REPO_ROOT")/ ? Type 'yes' to confirm: "
@@ -270,6 +278,12 @@ else
     echo "CLAUDE.md"
     remove_item "$REPO_ROOT/CLAUDE.md"
     gitignore_remove "CLAUDE.md"
+  fi
+
+  if [ "${SELECTED[5]}" -eq 1 ]; then
+    echo "DESIGN.md"
+    remove_item "$REPO_ROOT/DESIGN.md"
+    gitignore_remove "DESIGN.md"
   fi
 fi
 
