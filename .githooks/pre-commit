@@ -1,0 +1,26 @@
+#!/usr/bin/env bash
+# Auto-regenerate .ai/**/INDEX.md whenever memory or skill files change,
+# so committed indexes never drift from the source.
+
+set -euo pipefail
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+
+# Skip if no staged changes touch memory or skill files
+if ! git diff --cached --name-only --diff-filter=ACMRD \
+     | grep -qE '^\.ai/(global_memory|skills)/'; then
+  exit 0
+fi
+
+echo "skill-space: regenerating index files..."
+bash "$REPO_ROOT/.ai/build_indexes.sh"
+
+# Stage every index file that the build script produced
+git add "$REPO_ROOT"/.ai/global_memory/GLOBAL_MEMORY_INDEX.md \
+        "$REPO_ROOT"/.ai/skills/SKILLS_INDEX.md 2>/dev/null || true
+
+shopt -s nullglob
+for idx in "$REPO_ROOT"/.ai/skills/*/memory/MEMORY_INDEX.md; do
+  git add "$idx"
+done
+shopt -u nullglob
