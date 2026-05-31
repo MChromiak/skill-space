@@ -3,6 +3,10 @@
 > AUTO-GENERATED from git history by `.ai/build_indexes.sh` — do not edit manually.
 > Excludes `chore: skill-space auto-update` fixup commits so the log reflects intentional changes only.
 
+## 2026-05-31
+
+- `aef3868` — feat: add .skill-space/ runtime layout and auto-generated indexes
+
 ## 2026-05-03
 
 - `317f6e2` — Add global/local memory + indexes

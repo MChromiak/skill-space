@@ -24,5 +24,5 @@
 
 | Skill | Commits |
 |---|---|
-| git-commit | _(untracked)_ |
-| karpathy-coding-principles | _(untracked)_ |
+| git-commit | aef3868 |
+| karpathy-coding-principles | aef3868 |
