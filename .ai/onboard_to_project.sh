@@ -229,7 +229,20 @@ sync_from_ai() {
 }
 
 # ---------------------------------------------------------------------------
-# Run
+# Non-interactive mode (for hooks): --refresh runs Refresh silently and exits.
+# Exits 0 silently if nothing to refresh (no .skill-space/ and no root AGENTS.md).
+# ---------------------------------------------------------------------------
+if [ "${1:-}" = "--refresh" ]; then
+  [ ! -d "$REPO_ROOT/.skill-space" ] && [ ! -e "$REPO_ROOT/AGENTS.md" ] && exit 0
+  sync_from_ai >/dev/null 2>&1
+  if [ -f "$REPO_ROOT/DESIGN.md" ] || [ -L "$REPO_ROOT/DESIGN.md" ]; then
+    cp "$SCRIPT_DIR/DESIGN.md" "$REPO_ROOT/DESIGN.md" 2>/dev/null || true
+  fi
+  exit 0
+fi
+
+# ---------------------------------------------------------------------------
+# Run (interactive)
 # ---------------------------------------------------------------------------
 pick_mode
 

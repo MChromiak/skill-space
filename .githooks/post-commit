@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
-# After a commit that touched .ai/skills/ or .ai/global_memory/, regenerate
-# the skill/memory index files and create a fixup commit so the just-made
-# commit's own hash lands in the Modification history table.
+# After a commit that touched .ai/, regenerate skill/memory index files,
+# refresh .skill-space/ + root files from the updated .ai/ source, and
+# create a fixup commit so the just-made commit's own hash lands in the
+# Modification history table.
 #
 # Recursion guard: if the just-made commit is itself an auto-update commit,
 # this hook exits immediately.
@@ -15,14 +16,14 @@ if [[ "$LAST_MSG" == "chore: skill-space auto-update"* ]]; then
   exit 0
 fi
 
-# Skip if the just-made commit didn't touch skill or memory files.
-if ! git log -1 --name-only --format='' \
-   | grep -qE '^\.ai/(global_memory|skills)/'; then
+# Skip if the just-made commit didn't touch any .ai/ file.
+if ! git log -1 --name-only --format='' | grep -qE '^\.ai/'; then
   exit 0
 fi
 
-echo "skill-space: post-commit — regenerating skill/memory indexes..."
+echo "skill-space: post-commit — regenerating indexes and refreshing .skill-space/..."
 bash "$REPO_ROOT/.ai/build_indexes.sh"
+bash "$REPO_ROOT/.ai/onboard_to_project.sh" --refresh
 
 # Collect every index file that may have been (re)generated.
 AUTO_FILES=()
