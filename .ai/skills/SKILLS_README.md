@@ -38,6 +38,11 @@ Each skill's main `.md` file starts with YAML frontmatter:
 name: code-review
 description: Review pull requests for security, correctness, and conventions
 scope: on-demand
+added: 2026-05-04
+updated: 2026-05-04
+source:
+  - https://example.com/original-article
+  - https://github.com/example/source-repo
 ---
 
 # code-review
@@ -50,6 +55,11 @@ scope: on-demand
 | `name` | yes | short slug |
 | `description` | yes | one-line summary used by agents to filter relevance |
 | `scope` | yes | `always` (load on every task) or `on-demand` |
+| `added` | yes | `YYYY-MM-DD` — date the skill was first created. **Never change after creation.** |
+| `updated` | yes | `YYYY-MM-DD` — date of last meaningful edit. **Bump on every edit.** |
+| `source` | no | YAML list of URLs the skill is derived from (articles, repos, papers). Omit if original. |
+
+The build script reads `added` and `updated` and displays them in `SKILLS_INDEX.md` as table columns. Git commit hashes for every modification are appended automatically — see the `Modification history` section in the generated index.
 
 ### Picking the right scope
 
@@ -72,3 +82,5 @@ bash .ai/build_indexes.sh
 ```
 
 Commit the regenerated index files alongside your changes.
+
+> **Two-commit workflow:** when the `.githooks/post-commit` hook is enabled, every commit creates a follow-up `chore: skill-space auto-update after <hash>` commit that backfills your commit's own hash into the `Modification history` table and adds a new entry to [log.md](../../log.md). A commit cannot contain its own SHA, so the fixup must be a separate commit. See the root [README](../../README.md#-skills-and-memory) for full mechanics.

@@ -1,0 +1,43 @@
+#!/usr/bin/env bash
+# After every non-auto commit, regenerate skill/memory index files + the
+# project log, and create a fixup commit so the just-made commit's own hash
+# lands in the Modification history table and the new entry lands in log.md.
+#
+# Recursion guard: if the just-made commit is itself an auto-update commit,
+# this hook exits immediately.
+
+set -euo pipefail
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+
+LAST_MSG=$(git log -1 --format='%s')
+if [[ "$LAST_MSG" == "chore: skill-space auto-update"* ]]; then
+  exit 0
+fi
+
+echo "skill-space: post-commit — regenerating indexes + log.md..."
+bash "$REPO_ROOT/.ai/build_indexes.sh"
+
+# Collect every auto-generated file we might need to commit.
+AUTO_FILES=()
+[ -f "$REPO_ROOT/log.md" ] && AUTO_FILES+=("$REPO_ROOT/log.md")
+for f in "$REPO_ROOT"/.ai/global_memory/GLOBAL_MEMORY_INDEX.md \
+         "$REPO_ROOT"/.ai/skills/SKILLS_INDEX.md; do
+  [ -f "$f" ] && AUTO_FILES+=("$f")
+done
+
+shopt -s nullglob
+for idx in "$REPO_ROOT"/.ai/skills/*/memory/MEMORY_INDEX.md; do
+  AUTO_FILES+=("$idx")
+done
+shopt -u nullglob
+
+[ ${#AUTO_FILES[@]} -gt 0 ] && git add "${AUTO_FILES[@]}"
+
+if git diff --cached --quiet; then
+  echo "skill-space: auto files already current — no fixup commit needed."
+  exit 0
+fi
+
+ORIG_HASH=$(git rev-parse --short HEAD)
+git commit -m "chore: skill-space auto-update after $ORIG_HASH"

@@ -22,6 +22,8 @@ name: trusted-data-sources
 description: Curated list of reliable websites and APIs for market data
 type: reference
 scope: on-demand
+added: 2026-05-04
+updated: 2026-05-04
 ---
 
 # Trusted data sources
@@ -39,6 +41,11 @@ scope: on-demand
 | `description` | yes | one-line summary — agents use this to decide if the memory is relevant |
 | `type` | yes | one of: `reference`, `data-source`, `facts`, `glossary`, `policy` |
 | `scope` | yes | `always` (read on every task) or `on-demand` (read only when relevant) |
+| `added` | yes | `YYYY-MM-DD` — date the memory was first created. **Never change after creation.** |
+| `updated` | yes | `YYYY-MM-DD` — date of last meaningful edit. **Bump on every edit.** |
+| `source` | no | YAML list of URLs the memory is derived from (articles, repos, papers). Omit if original. |
+
+The build script reads `added` and `updated` and displays them as columns in `GLOBAL_MEMORY_INDEX.md`. Git commit hashes for every modification are appended automatically in the `Modification history` section of the generated index.
 
 ### Picking the right scope
 
@@ -54,6 +61,8 @@ bash .ai/build_indexes.sh
 ```
 
 Commit the regenerated index alongside your memory changes.
+
+> **Two-commit workflow:** when the `.githooks/post-commit` hook is enabled, every commit creates a follow-up `chore: skill-space auto-update after <hash>` commit that backfills your commit's own hash into the `Modification history` table and adds a new entry to [log.md](../../log.md). A commit cannot contain its own SHA, so the fixup must be a separate commit. See the root [README](../../README.md#-skills-and-memory) for full mechanics.
 
 ## Global vs skill-local memory
 

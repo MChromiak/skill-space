@@ -11,3 +11,6 @@ Thumbs.db
 # Python (in case any helper scripts get added)
 .python-version
 __pycache__/
+.skill-space/
+CLAUDE.md
+AGENTS.md

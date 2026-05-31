@@ -104,13 +104,40 @@ bash .ai/build_indexes.sh
 
 This rewrites every index file (`SKILLS_INDEX.md`, `GLOBAL_MEMORY_INDEX.md`, and any per-skill `MEMORY_INDEX.md`) from frontmatter, so they can't drift out of sync.
 
-A pre-commit hook ([.githooks/pre-commit](.githooks/pre-commit)) does this automatically — enable it once after cloning skill-space:
+Two git hooks ([.githooks/pre-commit](.githooks/pre-commit) and [.githooks/post-commit](.githooks/post-commit)) do this automatically — enable them once after cloning skill-space:
 
 ```bash
 git config core.hooksPath .githooks
 ```
 
-After that, any commit that touches `.ai/global_memory/` or `.ai/skills/` regenerates the affected index files and stages them into the same commit.
+After that, **every commit** triggers a two-commit workflow that keeps both the `Modification history` tables and the project log accurate:
+
+1. **Your commit** — if your change touches `.ai/global_memory/` or `.ai/skills/`, pre-commit regenerates the index files (with all hashes *up to but not including* the commit you're about to make) and stages them. The commit is created.
+2. **`chore: skill-space auto-update` fixup commit** — post-commit re-runs the build script. Now `git log` sees your commit, so:
+   - Index files are updated with your commit's hash in `Modification history`.
+   - [log.md](log.md) is updated with a new entry under today's date.
+   - A follow-up commit `chore: skill-space auto-update after <hash>` is created with these changes.
+
+The doubled commit is the price of having every commit's own SHA accurately reflected in auto-generated files — a commit cannot contain its own hash, so the fixup must live in a second commit. The recursion guard inside the post-commit hook prevents it from triggering itself.
+
+**Skip the fixup commit when you don't want it:** `git commit --no-verify` skips both hooks. If you want to disable the doubled-commit behavior permanently, delete or rename `.githooks/post-commit` — the indexes and log will then update only the next time you manually run `bash .ai/build_indexes.sh`.
+
+---
+
+## 📜 Project log
+
+[log.md](log.md) at the repo root is an auto-generated, reverse-chronological summary of every intentional commit, grouped by date:
+
+```markdown
+## 2026-05-04
+- `abc1234` — add karpathy-coding-principles skill
+- `def5678` — refine SKILLS_README scope guidance
+
+## 2026-05-03
+- `9012345` — add memory + skills discovery layers ...
+```
+
+It's regenerated from `git log` on every commit by the post-commit hook, with `chore: skill-space auto-update` fixup commits filtered out (so the log reflects intentional changes only, not bookkeeping). Never edit it manually — your edits will be overwritten by the next commit.
 
 ---
 
