@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
-# Regenerate skill/memory index files + the top-level project log.
+# Regenerate skill/memory index files from frontmatter.
 # Writes: .ai/skills/SKILLS_INDEX.md
 #         .ai/global_memory/GLOBAL_MEMORY_INDEX.md
 #         .ai/skills/<skill>/memory/MEMORY_INDEX.md  (for each skill that has memory/)
-#         log.md                                    (project root)
 # Run this whenever you add, rename, or remove a memory or skill file.
 
 set -euo pipefail
@@ -208,42 +207,6 @@ build_skills_index() {
   echo "  built: ${index#$SCRIPT_DIR/}"
 }
 
-# Regenerate the project log from git history.
-# Excludes "chore: skill-space auto-update" commits so the log stays
-# focused on intentional interactions.
-build_log() {
-  local log_file="$REPO_ROOT/log.md"
-  {
-    echo "# Project log"
-    echo ""
-    echo "> AUTO-GENERATED from git history by \`.ai/build_indexes.sh\` — do not edit manually."
-    echo "> Excludes \`chore: skill-space auto-update\` fixup commits so the log reflects intentional changes only."
-    echo ""
-
-    if [ "$IN_GIT_REPO" -ne 1 ]; then
-      echo "_(not in a git repo)_"
-      return
-    fi
-
-    local current_date=""
-    while IFS='|' read -r date hash subject; do
-      [ -z "$date" ] && continue
-      if [ "$date" != "$current_date" ]; then
-        [ -n "$current_date" ] && echo ""
-        echo "## $date"
-        echo ""
-        current_date="$date"
-      fi
-      echo "- \`$hash\` — $subject"
-    done < <(git -C "$REPO_ROOT" log --format='%cd|%h|%s' --date=short \
-                  --invert-grep --grep='^chore: skill-space auto-update' 2>/dev/null)
-
-    [ -z "$current_date" ] && echo "_(no commits yet)_"
-  } > "$log_file"
-
-  echo "  built: log.md"
-}
-
 echo "Rebuilding index files in .ai/..."
 
 [ -d "$SCRIPT_DIR/global_memory" ] && build_memory_index "$SCRIPT_DIR/global_memory" "Global memory index" "GLOBAL_MEMORY_INDEX.md"
@@ -255,7 +218,5 @@ for skill_mem in "$SCRIPT_DIR"/skills/*/memory; do
   build_memory_index "$skill_mem" "$(basename "$(dirname "$skill_mem")") memory index" "MEMORY_INDEX.md"
 done
 shopt -u nullglob
-
-build_log
 
 echo "done."

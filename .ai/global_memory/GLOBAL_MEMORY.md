@@ -62,7 +62,7 @@ bash .ai/build_indexes.sh
 
 Commit the regenerated index alongside your memory changes.
 
-> **Two-commit workflow:** when the `.githooks/post-commit` hook is enabled, every commit creates a follow-up `chore: skill-space auto-update after <hash>` commit that backfills your commit's own hash into the `Modification history` table and adds a new entry to [log.md](../../log.md). A commit cannot contain its own SHA, so the fixup must be a separate commit. See the root [README](../../README.md#-skills-and-memory) for full mechanics.
+> **Two-commit workflow:** when the `.githooks/post-commit` hook is enabled, every memory change creates a follow-up `chore: skill-space auto-update after <hash>` commit that backfills your commit's own hash into the `Modification history` table. A commit cannot contain its own SHA, so the fixup must be a separate commit. See the root [README](../../README.md#-skills-and-memory) for full mechanics.
 
 ## Global vs skill-local memory
 
